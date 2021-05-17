@@ -1,0 +1,92 @@
+---
+title: "Lab 6: The 12 Days of Christmas"
+author: "Ory Ratoviz"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(glue)
+```
+
+```{r}
+xmas <- read.csv("https://www.dropbox.com/s/e584pryn8evm1gz/xmas.csv?dl=1")
+```
+
+# Step One: Pluralizing the Data Set
+
+```{r}
+pluralize_gift <- function(gift) {
+
+  if (grepl("y$", gift))
+  {str_replace(gift, "y$", "ies")}
+  else if (grepl("e$", gift))
+  { str_replace(gift, "e$", "es")}
+  else if (grepl("n$", gift))
+  { str_replace(gift, "n$", "ns")}
+  else if (grepl("d$", gift))
+  { str_replace(gift, "d$", "ds")}
+  else if (grepl("g$", gift))
+  { str_replace(gift, "g$", "gs")}
+  else if (grepl("r$", gift))
+  { str_replace(gift, "r$", "rs")}
+
+  }
+
+
+xmas$Gift.Item <- purrr::map_chr(xmas$Gift.Item, pluralize_gift)
+
+```
+
+## Step Two: Creating Sentences
+
+```{r}
+make_phrase <- function(num, num_word, item, verb, adjective, location)
+  {
+  verb <- str_replace_na(verb, "")
+  adjective <- str_replace_na(adjective, "")
+  location <- str_replace_na(location, "")
+    glue("{num} {adjective} {item} {verb} {location}")
+}
+
+make_phrase(num = 10, 
+            num_word = "ten", 
+            item = "lords", 
+            verb = "a-leaping", 
+            adjective = "", 
+            location = "")
+
+
+ xmas <- xmas %>%
+   mutate(
+    Full.Phrase = pmap(xmas, ~make_phrase(..1,..2,..3,..4,..5,..6))
+   )
+ 
+
+```
+
+## Step Three: Iterations
+
+```{r}
+#sing_day <- function(dataset, line, phrase_col){
+
+ # phrases <- dataset %>% pull({{phrase_col}})
+  #dataset %>% filter==line 
+  #glue("On the {num_word} day of Christmas my true love gave to me {Full.Phrase}")
+}
+
+
+
+#sing_day(xmas, 2, Full.Phrase)
+
+```
+
+Step Four: Using the Package
+
+```{r}
+remotes::install_github("oryr/twelvedays")
+```
